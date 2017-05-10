@@ -6,15 +6,23 @@
 package DbInterface;
 
 import DbInterface.Facade;
+import Stub.FacadeStub;
 import entity.Book;
+import entity.City;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.spy;
+import org.mockito.Spy;
 
 /**
  *
@@ -33,7 +41,7 @@ public class FacadeUnitTest {
     public void setUp() {
     }
     
-     @Test
+    @Test
     public void testFindAllCitiesUnit() throws IOException{
     
         BufferedReader bufferedReader = Mockito.mock(BufferedReader.class);
@@ -43,6 +51,26 @@ public class FacadeUnitTest {
         assertThat(book.getAuthor(), is("TestMock author"));
         assertThat(book.getTitle(), is("TestMock title"));
         assertThat(book.getTmpCities().size(), is(3));
+    }
+    
+    /* 
+    Test
+        - First we test when the file dosent exists.
+        - Second we test when the files exists.
+    
+        To make this unit test we have to make a stub, so we can control the behavior
+    */
+    @Test
+    public void testInsertBooksWithCities() throws IOException{
+       FacadeStub instance = new FacadeStub(null);
+       Book book = instance.findAllPossibleCitiesInBook(null);
+       System.out.println("book result: "+book.getAuthor());
+        
+      boolean resFalse = instance.insertBooksWithCities("ThisFileDosentExists.txt");
+      assertThat(resFalse, is(false));
+
+      boolean resTrue = instance.insertBooksWithCities("/resources/10267.txt");
+      assertThat(resTrue, is(true));
     }
     
 }

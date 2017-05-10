@@ -39,11 +39,17 @@ public class Facade {
         this.db = db;
     }
 
-    public boolean insertBooksWithCities() {
-        //find all book files here in folder
-
-        for (int i = 5; i < 10; i++) {
+   public boolean insertBooksWithCitiesHelper(){
+        boolean result = true;
+         for (int i = 5; i < 1000; i++) {
             String path = "/home/nikolai/Desktop/dbtextfiles/txt/" + i + ".txt";
+            insertBooksWithCities(path);
+         }
+         return result;
+    }
+    public boolean insertBooksWithCities(String path) {
+        System.out.println("path: "+path);
+        //find all book files here in folder
             if (new File(path).exists()) {
 
                 Book book = null;
@@ -52,7 +58,7 @@ public class Facade {
                     //List<City> cities = db.findCities(book.getTmpCities());
                     //book.setCities(cities);
                 } catch (IOException ex) {
-                    System.out.println("Error in method insertBooksWithCities() - value: " + i);
+                    System.out.println("Error in method insertBooksWithCities() - value: " + path);
                     //ex.printStackTrace();
                     //Logger.getLogger(Facade.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -63,13 +69,13 @@ public class Facade {
                     System.out.println("Error in insertBooksWithCities()");
                 }
 
-                System.out.println(i + ":----------" + book.toString());
+                System.out.println(path + ":----------" + book.toString());
             }
             else{
                 System.out.println("File does not exist: "+path);
-                //return false;
+                return false;
             }
-        }
+        
         return true;
     }
 

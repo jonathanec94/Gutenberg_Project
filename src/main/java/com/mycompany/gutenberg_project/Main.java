@@ -19,6 +19,6 @@ public class Main {
 //new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/10267.txt")))
     public static void main(String[] args) {
         Main main = new Main();
-        main.instance.insertBooksWithCities();
+     //   main.instance.insertBooksWithCities();
     }
 }
