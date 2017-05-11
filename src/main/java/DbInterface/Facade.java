@@ -32,50 +32,56 @@ import java.util.regex.Pattern;
 public class Facade {
 
     DbInterface db;
-
     BufferedReader in;
-
+    private HashSet<String> englishWords;
+    
     public Facade(DbInterface db) {
         this.db = db;
+        this.englishWords = getEnglishWords();
     }
 
-   public boolean insertBooksWithCitiesHelper(){
+    public boolean insertBooksWithCitiesHelper() {
         boolean result = true;
-         for (int i = 5; i < 1000; i++) {
+        for (int i = 25; i < 100; i++) {
             String path = "/home/nikolai/Desktop/dbtextfiles/txt/" + i + ".txt";
             insertBooksWithCities(path);
-         }
-         return result;
+            break;
+        }
+        return result;
     }
+
     public boolean insertBooksWithCities(String path) {
-        System.out.println("path: "+path);
+//        System.out.println("path: "+path);
         //find all book files here in folder
-            if (new File(path).exists()) {
+        if (new File(path).exists()) {
 
-                Book book = null;
-                try {
-                    book = findAllPossibleCitiesInBook(new BufferedReader(new FileReader(path)));
-                    //List<City> cities = db.findCities(book.getTmpCities());
-                    //book.setCities(cities);
-                } catch (IOException ex) {
-                    System.out.println("Error in method insertBooksWithCities() - value: " + path);
-                    //ex.printStackTrace();
-                    //Logger.getLogger(Facade.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                if (book != null) {
-                    //db.insertBook(book);
-                } else {
-                    System.out.println("Error in insertBooksWithCities()");
-                }
-
-                System.out.println(path + ":----------" + book.toString());
+            Book book = null;
+            try {
+                book = findAllPossibleCitiesInBook(new BufferedReader(new FileReader(path)));
+                System.out.println("file path: "+path);
+                System.out.println("title: "+book.getTitle());
+                System.out.println("cities arr size: "+book.getTmpCities().size());
+                System.out.println(book.getTmpCities());
+                //List<City> cities = db.findCities(book.getTmpCities());
+                //book.setCities(cities);
+            } catch (IOException ex) {
+                System.out.println("Error in method insertBooksWithCities() - value: " + path);
+                //ex.printStackTrace();
+                //Logger.getLogger(Facade.class.getName()).log(Level.SEVERE, null, ex);
             }
-            else{
-                System.out.println("File does not exist: "+path);
-                return false;
+
+            if (book != null) {
+                //db.insertBook(book);
+            } else {
+                System.out.println("Error in insertBooksWithCities()");
             }
-        
+
+//                System.out.println(path + ":----------" + book.toString());
+        } else {
+            System.out.println("File does not exist: " + path);
+            return false;
+        }
+
         return true;
     }
 
@@ -88,7 +94,7 @@ public class Facade {
 
         boolean isBookStarted = false;
         HashSet<String> setWords = new HashSet<String>();
-
+        
         while ((line = in.readLine()) != null) {
             String lineLower = line.toUpperCase().replaceAll(" ", "");
             if (lineLower.contains("***START")) {
@@ -111,7 +117,12 @@ public class Facade {
                 if (m.find()) {
                     String tmpStr = m.group(0);
                     if (tmpStr.length() > 2) {
-                        setWords.add(m.group(0).toLowerCase());
+                        String word = m.group(0).toLowerCase();
+                        //if(!englishWords.contains(word))
+                        if (englishWords.contains(word)) {
+                            setWords.add(word);
+                        }
+
                     }
                 }
             }
@@ -122,6 +133,24 @@ public class Facade {
         book.setTmpCities(list);
 
         return book;
+    }
+
+    public HashSet getEnglishWords() {
+        //BufferedReader in = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/10000-english-word.txt")));
+        BufferedReader in = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/all_cities_txt.txt")));
+        String line;
+
+        HashSet hs = new HashSet();
+
+        try {
+            while ((line = in.readLine()) != null) {
+                hs.add(line.toLowerCase());
+            }
+             in.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Facade.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return hs;
     }
 
 }

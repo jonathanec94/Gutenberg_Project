@@ -69,7 +69,7 @@ public class FacadeUnitTest {
       boolean resFalse = instance.insertBooksWithCities("ThisFileDosentExists.txt");
       assertThat(resFalse, is(false));
 
-      boolean resTrue = instance.insertBooksWithCities("/resources/10267.txt");
+      boolean resTrue = instance.insertBooksWithCities(this.getClass().getResource("/10267.txt").getFile());
       assertThat(resTrue, is(true));
     }
     
