@@ -10,32 +10,32 @@ import DtoEntity.DtoBookAuthor;
 import DtoEntity.DtoBookCity;
 import DtoEntity.DtoCity;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
+import com.mongodb.Block;
+import com.mongodb.DBObject;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import entity.Book;
 import org.bson.Document;
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.lang.Double.parseDouble;
-
 /**
  *
  * @author nikolai
  */
-public class MongoFacade implements DbInterface{
+public class MongoFacade implements DbInterface {
 
     @Override
     public List<DtoCity> findCities(List<String> city) {
-        List  list = new ArrayList<DtoCity>();
+        System.out.println("findCities");
+        List list = new ArrayList<>();
         MongoDatabase dbConnection = MongoDBConnector.getDBConnection();
         MongoCollection<Document> cityCollection = dbConnection.getCollection("cities");
-        List<Document> cities = (List<Document>) cityCollection.find().into(  new ArrayList<Document>());
+        List<Document> cities = cityCollection.find().into(new ArrayList<Document>());
 
         for (Document cityObject : cities) {
             System.out.println(cityObject);
-            if(cityObject.get("latitude").toString().isEmpty() == false && cityObject.get("longitude").toString().isEmpty() == false) {
+            if (cityObject.get("latitude").toString().isEmpty() == false && cityObject.get("longitude").toString().isEmpty() == false) {
 
                 list.add(new DtoCity(cityObject.get("name").toString(), Double.parseDouble(cityObject.get("latitude").toString()), Double.parseDouble(cityObject.get("longitude").toString())));
             }
@@ -46,42 +46,88 @@ public class MongoFacade implements DbInterface{
 
     @Override
     public boolean insertBook(Book book) {
-        try{
-            MongoDatabase dbConnection = MongoDBConnector.getDBConnection();
-            DBCollection coll = dbConnection.getCollection("books");
-            System.out.println("Collection selected successfully");
+        System.out.println("insertBook");
+        MongoDatabase db = MongoDBConnector.getDBConnection();
+        MongoCollection<Document> books = db.getCollection("books");
 
-            BasicDBObject doc = new BasicDBObject("title", book.getTitle()).
-                    append("author", book.getAuthor()).
-                    append("cities", book.getCities()).
-                    append("tmpCities", book.getTmpCities());
-
-            coll.insert(doc);
-            System.out.println("Document inserted successfully");
-        }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-        }
+        //create book
+        books.insertOne(new Document().append("author", book.getAuthor()).append("title", book.getTitle()).append("cities", book.getCities()).append("tmpCities", book.getTmpCities()));
+        return true;
     }
 
     @Override
-    public List<DtoBookAuthor> getBooksByCity(String city) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<DtoBookAuthor> getBooksByCity(final String city) {
+        System.out.println("getBooksByCity");
+        List list = new ArrayList<>();
+        MongoDatabase dbConnection = MongoDBConnector.getDBConnection();
+        FindIterable<Document> iterable = dbConnection.getCollection("books").find();
+        iterable.forEach(new Block<Document>() {
+            @Override
+            public void apply(final Document document) {
+                if (document.get("cities").toString().contains(city)) {
+                    System.out.println(document.get("title").toString());
+                }
+            }
+        });
+        return list;
     }
 
     @Override
-    public List<DtoCity> getCitiesByTitle(String title) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<DtoCity> getCitiesByTitle(final String title) {
+        System.out.println("getCitiesByTitle");
+        List list = new ArrayList<>();
+        MongoDatabase dbConnection = MongoDBConnector.getDBConnection();
+        BasicDBObject query = new BasicDBObject("title", title);
+        FindIterable<Document> iterable = dbConnection.getCollection("cities").find(query);
+        iterable.forEach(new Block<Document>() {
+            @Override
+            public void apply(final Document document) {
+                if (document.get("name").toString().toLowerCase().equals(title.toLowerCase())) {
+                    System.out.println(document.get("name").toString());
+                }
+            }
+        });
+        return list;
     }
 
     @Override
-    public List<DtoBookAuthor> getBooksByAuthor(String author) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<DtoBookAuthor> getBooksByAuthor(final String authorString) {
+        System.out.println("getBooksByAuthor");
+        List list = new ArrayList<>();
+        MongoDatabase dbConnection = MongoDBConnector.getDBConnection();
+        FindIterable<Document> iterable = dbConnection.getCollection("books").find();
+        iterable.forEach(new Block<Document>() {
+            @Override
+            public void apply(final Document document) {
+                if (document.get("author").toString().toLowerCase().equals(authorString.toLowerCase())) {
+                    System.out.println(document.get("name").toString());
+
+                }
+            }
+        });
+        return list;
     }
 
     @Override
     public List<DtoBookCity> getBooksByGeolocation(double latitude, double longitude) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("getBooksByGeolocation");
+        List list = new ArrayList<>();
+
+        BasicDBObject criteria = new BasicDBObject("$near", new double[]{-80.23, 13.1112});
+        criteria.put("$maxDistance", 1000);
+
+        BasicDBObject query = new BasicDBObject("location", criteria);
+        MongoDatabase dbConnection = MongoDBConnector.getDBConnection();
+        FindIterable<Document> iterable = dbConnection.getCollection("cities").find(query);
+        iterable.forEach(new Block<Document>() {
+            @Override
+            public void apply(final Document document) {
+                System.out.println(document.get("name").toString());
+            }
+        });
+        return list;
     }
+
 
 
 
