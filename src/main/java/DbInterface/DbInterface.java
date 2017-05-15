@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface DbInterface {
     
-    public List<City> findCities(List<String> city);
+    public List<DtoCity> findCities(List<String> city);
     public boolean insertBook(Book book);
     
     public List<DtoBookAuthor> getBooksByCity(String city);
