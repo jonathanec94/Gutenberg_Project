@@ -59,7 +59,7 @@ public class FacadeIntegrationTest {
         
         assertThat(book.getAuthor(), is("Captain Quincy Allen"));
         assertThat(book.getTitle(), is("The Outdoor Chums"));
-        assertThat(book.getTmpCities().size(), is(453));
+        assertThat(book.getTmpCities().size(), is(17));
     }
     
    

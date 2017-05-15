@@ -45,12 +45,12 @@ public class FacadeUnitTest {
     public void testFindAllCitiesUnit() throws IOException{
     
         BufferedReader bufferedReader = Mockito.mock(BufferedReader.class);
-        Mockito.when(bufferedReader.readLine()).thenReturn("Title: TestMock title", "Author: TestMock author", "*** START", "City wgwe Copenhagen","test. Hello there", null);
+        Mockito.when(bufferedReader.readLine()).thenReturn("Title: TestMock title", "Author: TestMock author", "*** START", "City wgwe Copenhagen","test. Hello there","Dubai","Zaranj", null);
         Facade instance = new Facade(null);
         Book book = instance.findAllPossibleCitiesInBook(bufferedReader);
         assertThat(book.getAuthor(), is("TestMock author"));
         assertThat(book.getTitle(), is("TestMock title"));
-        assertThat(book.getTmpCities().size(), is(3));
+        assertThat(book.getTmpCities().size(), is(2));
     }
     
     /* 
