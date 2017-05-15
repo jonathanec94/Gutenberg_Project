@@ -45,12 +45,15 @@ public class FacadeUnitTest {
     public void testFindAllCitiesUnit() throws IOException{
     
         BufferedReader bufferedReader = Mockito.mock(BufferedReader.class);
-        Mockito.when(bufferedReader.readLine()).thenReturn("Title: TestMock title", "Author: TestMock author", "*** START", "City wgwe Copenhagen","test. Hello there","Dubai","Zaranj", null);
+        Mockito.when(bufferedReader.readLine()).thenReturn("Title: TestMock title", "Author: TestMock author", "*** START", "City wgwe penhagen","test. Hello there","Dubai","Zaranj", null);
         Facade instance = new Facade(null);
         Book book = instance.findAllPossibleCitiesInBook(bufferedReader);
         assertThat(book.getAuthor(), is("TestMock author"));
         assertThat(book.getTitle(), is("TestMock title"));
         assertThat(book.getTmpCities().size(), is(2));
+        assertThat(book.getTmpCities().get(1), is("dubai"));
+        assertThat(book.getTmpCities().get(0), is("zaranj"));
+
     }
     
     /* 
@@ -64,13 +67,23 @@ public class FacadeUnitTest {
     public void testInsertBooksWithCities() throws IOException{
        FacadeStub instance = new FacadeStub(null);
        Book book = instance.findAllPossibleCitiesInBook(null);
-       System.out.println("book result: "+book.getAuthor());
         
       boolean resFalse = instance.insertBooksWithCities("ThisFileDosentExists.txt");
       assertThat(resFalse, is(false));
 
       boolean resTrue = instance.insertBooksWithCities(this.getClass().getResource("/10267.txt").getFile());
       assertThat(resTrue, is(true));
+    }
+    
+    @Test
+    public void testInsertBooksWithCitiesHelper() throws IOException{
+        FacadeStub instance = new FacadeStub(null);
+        assertThat(instance.insertBooksWithCitiesHelper(), is(true));
+    }
+    
+    @Test
+    public void testGetEnglishWords() throws IOException{
+      
     }
     
 }
