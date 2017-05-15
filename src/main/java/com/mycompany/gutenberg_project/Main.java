@@ -11,31 +11,31 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import sql.SqlDBConnector;
+import sql.SqlFacade;
 
 /**
  *
  * @author nikolai
  */
 public class Main {
-
-    Facade instance = new Facade(null);
+    
 //new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/10267.txt")))
 
-    public void testGetEnglishWords() throws IOException{
-       Book book = instance.findAllPossibleCitiesInBook(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/10267.txt"))));
-        System.out.println("size: "+book.getTmpCities().size()); 
-//       for (String city : book.getTmpCities()) {
-//            System.out.println(city);
-//        }
-    }
+//    public void testGetEnglishWords() throws IOException{
+//       Book book = instance.findAllPossibleCitiesInBook(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/10267.txt"))));
+//        System.out.println("size: "+book.getTmpCities().size()); 
+////       for (String city : book.getTmpCities()) {
+////            System.out.println(city);
+////        }
+//    }
     
-       
+//       
+    SqlFacade sqlFacade = new SqlFacade();
+    Facade instance = new Facade(sqlFacade);
     public static void main(String[] args) throws IOException {
         Main main = new Main();
         //main.testGetEnglishWords();
-        
-        main.instance.insertBooksWithCitiesHelper();
-        
+//        main.instance.insertBooksWithCitiesHelper(); 
     }
 //    public static void main(String[] args) {
 //        if(SqlDBConnector.getDBConnection() != null)

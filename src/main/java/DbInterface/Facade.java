@@ -34,7 +34,7 @@ public class Facade {
     DbInterface db;
     BufferedReader in;
     private HashSet<String> englishWords;
-    
+
     public Facade(DbInterface db) {
         this.db = db;
         this.englishWords = getEnglishWords();
@@ -42,10 +42,9 @@ public class Facade {
 
     public boolean insertBooksWithCitiesHelper() {
         boolean result = true;
-        for (int i = 25; i < 100; i++) {
+        for (int i = 39999; i < 54661; i++) {
             String path = "/home/nikolai/Desktop/dbtextfiles/txt/" + i + ".txt";
             insertBooksWithCities(path);
-            break;
         }
         return result;
     }
@@ -57,28 +56,21 @@ public class Facade {
 
             Book book = null;
             try {
-                book = findAllPossibleCitiesInBook(new BufferedReader(new FileReader(path)));
-                System.out.println("file path: "+path);
-                System.out.println("title: "+book.getTitle());
-                System.out.println("cities arr size: "+book.getTmpCities().size());
-                System.out.println(book.getTmpCities());
-                //List<City> cities = db.findCities(book.getTmpCities());
-                //book.setCities(cities);
+                book = findAllPossibleCitiesInBook(new BufferedReader(new FileReader(path))); 
             } catch (IOException ex) {
-                System.out.println("Error in method insertBooksWithCities() - value: " + path);
+               // System.out.println("Error in method insertBooksWithCities() - value: " + path);
                 //ex.printStackTrace();
-                //Logger.getLogger(Facade.class.getName()).log(Level.SEVERE, null, ex);
             }
 
             if (book != null) {
-                //db.insertBook(book);
+                db.insertBook(book);
             } else {
-                System.out.println("Error in insertBooksWithCities()");
+              //  System.out.println("Error in insertBooksWithCities()");
             }
 
 //                System.out.println(path + ":----------" + book.toString());
         } else {
-            System.out.println("File does not exist: " + path);
+            //System.out.println("File does not exist: " + path);
             return false;
         }
 
@@ -91,18 +83,28 @@ public class Facade {
         book.setTitle("Unknown");
 
         String line;
+        String title;
+        String author;
 
         boolean isBookStarted = false;
         HashSet<String> setWords = new HashSet<String>();
-        
+
         while ((line = in.readLine()) != null) {
             String lineLower = line.toUpperCase().replaceAll(" ", "");
             if (lineLower.contains("***START")) {
                 isBookStarted = true;
             } else if (!isBookStarted && line.toLowerCase().contains("title")) {
-                book.setTitle(line.replace("Title: ", ""));
+                title = line.replace("Title: ", "");
+                if(title.length() < 500)
+                    book.setTitle(title);
+                else
+                    book.setTitle("");
             } else if (!isBookStarted && line.toLowerCase().contains("author")) {
-                book.setAuthor(line.replace("Author: ", ""));
+                author = line.replace("Author: ", "");
+                if(author.length() < 500)
+                    book.setAuthor(author);
+                else
+                    book.setAuthor("");
             }
 
             //Look through the book after the cities  
@@ -137,7 +139,7 @@ public class Facade {
 
     public HashSet getEnglishWords() {
         //BufferedReader in = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/10000-english-word.txt")));
-        BufferedReader in = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/all_cities_txt.txt")));
+        BufferedReader in = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/all_cities_txt.csv")));
         String line;
 
         HashSet hs = new HashSet();
@@ -146,7 +148,7 @@ public class Facade {
             while ((line = in.readLine()) != null) {
                 hs.add(line.toLowerCase());
             }
-             in.close();
+            in.close();
         } catch (IOException ex) {
             Logger.getLogger(Facade.class.getName()).log(Level.SEVERE, null, ex);
         }
