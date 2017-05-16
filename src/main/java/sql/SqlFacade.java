@@ -16,6 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,7 +30,11 @@ public class SqlFacade implements DbInterface{
 
     @Override
     public List<DtoCity> findCities(List<String> city) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<DtoCity> result = new ArrayList();
+        for(String item : city  ){
+            result.add(new DtoCity(item,2,1));
+        }
+        return result;
     }
 
     @Override
@@ -68,30 +74,34 @@ public class SqlFacade implements DbInterface{
             con.commit();
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            System.exit(0);
+           return false;
         }
-        return false;
+        return true;
     }
 
     @Override
     public List<DtoBookAuthor> getBooksByCity(String city) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<DtoBookAuthor> list = new ArrayList(Arrays.asList(new DtoBookAuthor("book 1", "author 1"),new DtoBookAuthor("book 1", "author 1")));
+        
+        return list;
     }
 
     @Override
     public List<DtoCity> getCitiesByTitle(String title) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<DtoCity> list = new ArrayList(Arrays.asList(new DtoCity("city 1",1,1),new DtoCity("city 2", 2,2)));
+        return list;
     }
 
     @Override
     public List<DtoBookAuthor> getBooksByAuthor(String author) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<DtoBookAuthor> list = new ArrayList(Arrays.asList(new DtoBookAuthor("book 1", "author 1"),new DtoBookAuthor("book 1", "author 1")));
+        return list;
     }
 
     @Override
     public List<DtoBookCity> getBooksByGeolocation(double latitude, double longitude) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<DtoBookCity> list = new ArrayList(Arrays.asList(new DtoBookCity("book 1", "author 1"),new DtoBookCity("book 2", "author 2")));
+        return list;
     }
 
 }

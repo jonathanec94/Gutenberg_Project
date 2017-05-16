@@ -13,6 +13,12 @@ public class DtoBookCity {
     private String title;
     private String author;
 
+    public DtoBookCity(String title, String author) {
+        this.title = title;
+        this.author = author;
+    }
+
+    
     public String getTitle() {
         return title;
     }

@@ -50,7 +50,7 @@ public class FacadeIntegrationTest {
      * Test of findAllCities method, of class Facade.
      */
   
-    @Test
+  /* @Test
     public void testFindAllCities() throws IOException, FileNotFoundException {
         //Should not be null
        BufferedReader in  = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/10267.txt")));
@@ -63,12 +63,13 @@ public class FacadeIntegrationTest {
         assertThat(book.getTitle(), is("The Outdoor Chums"));
         assertThat(book.getTmpCities().size(), is(17));
     }
-    
+    */
        /* 
     Test
         - First we test when the file dosent exists.
         - Second we test when the files exists.
     */
+    /*
      @Test
     public void testInsertBooksWithCities() throws IOException{
        Facade instance = new Facade(new SqlFacade());
@@ -78,17 +79,17 @@ public class FacadeIntegrationTest {
         
       /*boolean resFalse = instance.insertBooksWithCities("ThisFileDosentExists.txt");
       assertThat(resFalse, is(false));*/
-
+/*
       boolean resTrue = instance.insertBooksWithCities(this.getClass().getResource("/10267.txt").getFile());
       assertThat(resTrue, is(true));
-    }
-    
+    }*/
+    /*
       @Test
     public void testinsertBooksWithCitiesHelper() throws IOException{
         Facade instance = new Facade(null);
         assertThat(instance.insertBooksWithCitiesHelper(), is(true));
     }
-    
+    */
    
     
 }
