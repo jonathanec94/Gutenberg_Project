@@ -19,6 +19,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mockito.Mockito;
+import sql.SqlFacade;
 
 /**
  *
@@ -48,6 +49,7 @@ public class FacadeIntegrationTest {
     /**
      * Test of findAllCities method, of class Facade.
      */
+  
     @Test
     public void testFindAllCities() throws IOException, FileNotFoundException {
         //Should not be null
@@ -69,13 +71,13 @@ public class FacadeIntegrationTest {
     */
      @Test
     public void testInsertBooksWithCities() throws IOException{
-       Facade instance = new Facade(null);
+       Facade instance = new Facade(new SqlFacade());
               BufferedReader in  = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/10267.txt")));
 
        Book book = instance.findAllPossibleCitiesInBook(in);
         
-      boolean resFalse = instance.insertBooksWithCities("ThisFileDosentExists.txt");
-      assertThat(resFalse, is(false));
+      /*boolean resFalse = instance.insertBooksWithCities("ThisFileDosentExists.txt");
+      assertThat(resFalse, is(false));*/
 
       boolean resTrue = instance.insertBooksWithCities(this.getClass().getResource("/10267.txt").getFile());
       assertThat(resTrue, is(true));
