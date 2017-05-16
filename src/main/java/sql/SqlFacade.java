@@ -27,7 +27,7 @@ public class SqlFacade implements DbInterface{
     Connection con = SqlDBConnector.getDBConnection();
 
     @Override
-    public List<City> findCities(List<String> city) {
+    public List<DtoCity> findCities(List<String> city) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
