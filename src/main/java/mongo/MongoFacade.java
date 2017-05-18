@@ -1,36 +1,33 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mongo;
 
 import DbInterface.DbInterface;
 import DtoEntity.DtoBookAuthor;
-import DtoEntity.DtoBookCity;
 import DtoEntity.DtoCity;
 import com.mongodb.BasicDBObject;
 import com.mongodb.Block;
-import com.mongodb.DBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import entity.Book;
 import org.bson.Document;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
+
+//import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
+
 /**
  *
  * @author nikolai
  */
 public class MongoFacade implements DbInterface {
 
+    private MongoDatabase database = MongoDBConnector.getDBConnection();
+
     @Override
     public List<DtoCity> findCities(List<String> city) {
-        System.out.println("findCities");
         List list = new ArrayList<>();
-        MongoDatabase dbConnection = MongoDBConnector.getDBConnection();
-        MongoCollection<Document> cityCollection = dbConnection.getCollection("cities");
+        MongoCollection<Document> cityCollection = database.getCollection("cities");
         List<Document> cities = cityCollection.find().into(new ArrayList<Document>());
 
         for (Document cityObject : cities) {
@@ -41,94 +38,129 @@ public class MongoFacade implements DbInterface {
             }
         }
         return list;
-
     }
 
     @Override
     public boolean insertBook(Book book) {
-        System.out.println("insertBook");
-        MongoDatabase db = MongoDBConnector.getDBConnection();
-        MongoCollection<Document> books = db.getCollection("books");
-
-        //create book
+        MongoCollection<Document> books = database.getCollection("books");
         books.insertOne(new Document().append("author", book.getAuthor()).append("title", book.getTitle()).append("cities", book.getCities()).append("tmpCities", book.getTmpCities()));
         return true;
     }
 
+    /**
+     * Given a city name the method returns all book titles
+     * with corresponding authors that mention this city.
+     */
     @Override
     public List<DtoBookAuthor> getBooksByCity(final String city) {
-        System.out.println("getBooksByCity");
-        List list = new ArrayList<>();
-        MongoDatabase dbConnection = MongoDBConnector.getDBConnection();
-        FindIterable<Document> iterable = dbConnection.getCollection("books").find();
-        iterable.forEach(new Block<Document>() {
-            @Override
-            public void apply(final Document document) {
-                if (document.get("cities").toString().contains(city)) {
-                    System.out.println(document.get("title").toString());
-                }
-            }
-        });
-        return list;
+        List<DtoBookAuthor> result = new ArrayList<>();
+        FindIterable<Document> documents = database.getCollection("books").find(eq("cities", city));
+
+        for (Document document: documents) {
+            result.add(new DtoBookAuthor(document.get("title").toString(), document.get("author").toString()));
+        }
+
+        return result;
     }
 
+    /**
+     * Given a book title, the method fetches all cities mentioned
+     * in the book and plots all the cities onto a map.
+     */
     @Override
     public List<DtoCity> getCitiesByTitle(final String title) {
-        System.out.println("getCitiesByTitle");
-        List list = new ArrayList<>();
-        MongoDatabase dbConnection = MongoDBConnector.getDBConnection();
-        BasicDBObject query = new BasicDBObject("title", title);
-        FindIterable<Document> iterable = dbConnection.getCollection("cities").find(query);
-        iterable.forEach(new Block<Document>() {
-            @Override
-            public void apply(final Document document) {
-                if (document.get("name").toString().toLowerCase().equals(title.toLowerCase())) {
-                    System.out.println(document.get("name").toString());
-                }
+        List<DtoCity> result = new ArrayList<>();
+        ArrayList bookCities = new ArrayList();
+
+        FindIterable<Document> books = database.getCollection("books").find(eq("title", title));
+
+        for (Document book: books) {
+            bookCities = (ArrayList) book.get("cities");
+        }
+
+        for (int i = 0; i < bookCities.size(); i++) {
+            FindIterable<Document> cities = database.getCollection("cities").find(eq("name", bookCities.get(i)));
+
+            for (Document city: cities) {
+                ArrayList coordinates = (ArrayList) city.get("location", Document.class).get("coordinates");
+                result.add(new DtoCity(city.getString("name"),
+                        Double.valueOf(coordinates.get(0).toString()),
+                        Double.valueOf(coordinates.get(1).toString())));
             }
-        });
-        return list;
+        }
+
+        plotCitiesToMap(result);
+
+        return result;
     }
 
+    /**
+     * Given an author name the method lists all books written by that author
+     * and plots all cities mentioned in any of the books onto a map.
+     */
     @Override
-    public List<DtoBookAuthor> getBooksByAuthor(final String authorString) {
-        System.out.println("getBooksByAuthor");
-        List list = new ArrayList<>();
-        MongoDatabase dbConnection = MongoDBConnector.getDBConnection();
-        FindIterable<Document> iterable = dbConnection.getCollection("books").find();
-        iterable.forEach(new Block<Document>() {
-            @Override
-            public void apply(final Document document) {
-                if (document.get("author").toString().toLowerCase().equals(authorString.toLowerCase())) {
-                    System.out.println(document.get("name").toString());
+    public List<DtoBookAuthor> getBooksByAuthor(final String author) {
+        List<DtoCity> result = new ArrayList<>();
+        List<DtoBookAuthor> bookAuthor = new ArrayList<>();
+        Set<String> cities = new HashSet<>();
 
-                }
+        FindIterable<Document> books = database.getCollection("books").find(eq("author", author));
+
+        for (Document book: books) {
+
+            bookAuthor.add(new DtoBookAuthor(book.getString("title"), book.getString("author")));
+
+            ArrayList bookCities = (ArrayList) book.get("cities");
+
+            for (int i = 0; i < bookCities.size(); i++) {
+                cities.add(bookCities.get(i).toString());
             }
-        });
-        return list;
+        }
+
+        for (String cityString : cities) {
+            FindIterable<Document> citiesList = database.getCollection("cities").find(eq("name", cityString));
+
+            for (Document city : citiesList) {
+                ArrayList coordinates = (ArrayList) city.get("location", Document.class).get("coordinates");
+                result.add(new DtoCity(city.getString("name"),
+                        Double.valueOf(coordinates.get(0).toString()),
+                        Double.valueOf(coordinates.get(1).toString())));
+            }
+
+        }
+
+        plotCitiesToMap(result);
+
+        return bookAuthor;
     }
 
+    /**
+     * Given a geolocation, the method lists all books mentioning
+     * a city in vicinity of the given geolocation.
+     */
     @Override
-    public List<DtoBookCity> getBooksByGeolocation(double latitude, double longitude) {
-        System.out.println("getBooksByGeolocation");
-        List list = new ArrayList<>();
+    public List<DtoBookAuthor> getBooksByGeolocation(double latitude, double longitude) {
+        List<DtoBookAuthor> result = new ArrayList<>();
 
-        BasicDBObject criteria = new BasicDBObject("$near", new double[]{-80.23, 13.1112});
-        criteria.put("$maxDistance", 1000);
+        double distance = 10 / 6378.1;
 
-        BasicDBObject query = new BasicDBObject("location", criteria);
-        MongoDatabase dbConnection = MongoDBConnector.getDBConnection();
-        FindIterable<Document> iterable = dbConnection.getCollection("cities").find(query);
-        iterable.forEach(new Block<Document>() {
-            @Override
-            public void apply(final Document document) {
-                System.out.println(document.get("name").toString());
+        FindIterable<Document> cities = database.getCollection("cities").find(
+                geoWithinCenterSphere("location", longitude, latitude, distance));
+
+        for (Document city: cities) {
+            FindIterable<Document> books = database.getCollection("books")
+                    .find(eq("cities", city.getString("name")));
+
+            for (Document book : books) {
+                result.add(new DtoBookAuthor(book.getString("title"), book.getString("author")));
             }
-        });
-        return list;
+        }
+
+        return result;
     }
 
+    public void plotCitiesToMap(List<DtoCity> cities) {
 
-
+    }
 
 }
