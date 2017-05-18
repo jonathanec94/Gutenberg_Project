@@ -185,13 +185,15 @@ public class SqlFacade implements DbInterface {
     }
 
     @Override
-    public List<DtoCity> getBooksByGeolocation(double latitude, double longitude) {
-        List<DtoCity> citysList = new ArrayList<>();
-        int radiusInMeter = 20000;
+    public List<DtoBookAuthor> getBooksByGeolocation(double latitude, double longitude) {
+        List<DtoBookAuthor> books = new ArrayList<>();
+        int radiusInMeter = 10000;
 
         try {
-            String sqlFindCitiesNearBy = "SELECT * FROM cities "
-                    + "WHERE ST_DWithin(geom, ST_GeographyFromText(?), ? );";
+            String sqlFindCitiesNearBy = "SELECT * FROM books "
+                    + "INNER JOIN cityinbook ON cityinbook.bookid = books.id "
+                    + "INNER JOIN cities ON cities.name = cityinbook.cityname "
+                    + "WHERE ST_DWithin(cities.geom, ST_GeographyFromText(?), ? );";
             PreparedStatement statementFindCities = null;
             statementFindCities = con.prepareStatement(sqlFindCitiesNearBy);
             //not right to do, but how should i escape single quotes in a PreparedStatement???
@@ -201,7 +203,7 @@ public class SqlFacade implements DbInterface {
             ResultSet rsFindCities = statementFindCities.executeQuery();
 
             while (rsFindCities.next()) {
-                citysList.add(new DtoCity(rsFindCities.getString("name"), rsFindCities.getDouble("latitude"), rsFindCities.getDouble("longitude")));
+                books.add(new DtoBookAuthor(rsFindCities.getString("title"), rsFindCities.getString("author")));
             }
             rsFindCities.close();
             statementFindCities.close();
@@ -210,7 +212,7 @@ public class SqlFacade implements DbInterface {
             System.exit(0);
         }
 
-        return citysList;
+        return books;
     }
 
     //not a part of the interface
