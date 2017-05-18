@@ -22,6 +22,6 @@ public interface DbInterface {
     public List<DtoBookAuthor> getBooksByCity(String city);
     public List<DtoCity> getCitiesByTitle(String title);
     public List<DtoBookAuthor> getBooksByAuthor(String author);
-    public List<DtoCity> getBooksByGeolocation(double latitude, double longitude); 
+    public List<DtoBookAuthor> getBooksByGeolocation(double latitude, double longitude);
     
 }
