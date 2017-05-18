@@ -21,15 +21,24 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.sql.DataSource;
 
 /**
  *
  * @author nikolai
  */
 public class SqlFacade implements DbInterface {
-
-    Connection con = SqlDBConnector.getDBConnection();
-
+    Connection con;
+     public SqlFacade()
+    {
+         SqlDBConnector.getDBConnection();
+    }
+    
+       public SqlFacade(DataSource ds)
+    {
+         con = SqlDBConnector.setSource(ds);
+    }
+    
     @Override
     public List<DtoCity> findCities(List<String> city) {
         List<DtoCity> result = new ArrayList();
@@ -44,13 +53,13 @@ public class SqlFacade implements DbInterface {
         Statement stmt = null;
 
         try {
-            con.setAutoCommit(false);
-            stmt = con.createStatement();
+            SqlDBConnector.getDBConnection().setAutoCommit(false);
+            stmt = SqlDBConnector.getDBConnection().createStatement();
 
             String sqlBook = "INSERT INTO BOOKS (title,author) "
                     + "VALUES (?, ?) RETURNING id;";
             PreparedStatement preparedStatement = null;
-            preparedStatement = con.prepareStatement(sqlBook);
+            preparedStatement = SqlDBConnector.getDBConnection().prepareStatement(sqlBook);
             preparedStatement.setString(1, book.getTitle());
             preparedStatement.setString(2, book.getAuthor());
 
@@ -73,7 +82,7 @@ public class SqlFacade implements DbInterface {
                 stmt.executeUpdate(sqlBooksCities);
             }
             stmt.close();
-            con.commit();
+            SqlDBConnector.getDBConnection().commit();
 
         } catch (SQLException ex) {
             return false;
@@ -92,11 +101,12 @@ public class SqlFacade implements DbInterface {
                 + "WHERE cityname = ?;";
         PreparedStatement statementGetBooks = null;
         try {
-            statementGetBooks = con.prepareStatement(sqlFindBooksByCity);
+            statementGetBooks = SqlDBConnector.getDBConnection().prepareStatement(sqlFindBooksByCity);
             statementGetBooks.setString(1, city);
             ResultSet rsFindBooks = statementGetBooks.executeQuery();
 
             while (rsFindBooks.next()) {
+                
                 //System.out.println("id: "+ rsFindBooks.getInt("id"));
                 listOfBooks.add(new DtoBookAuthor(rsFindBooks.getString("title"), rsFindBooks.getString("author")));
             }
@@ -118,7 +128,7 @@ public class SqlFacade implements DbInterface {
                 + "WHERE books.title = ?;";
         PreparedStatement statementGetCities = null;
         try {
-            statementGetCities = con.prepareStatement(sqlGetCitiesByTtile);
+            statementGetCities = SqlDBConnector.getDBConnection().prepareStatement(sqlGetCitiesByTtile);
             statementGetCities.setString(1, title);
             ResultSet rsCities = statementGetCities.executeQuery();
             while (rsCities.next()) {
@@ -141,7 +151,7 @@ public class SqlFacade implements DbInterface {
         String sqlFindAllBooksOnAuthor = "SELECT id, title, author FROM books WHERE books.author = ?";
         PreparedStatement statementFindBooks = null;
         try {
-            statementFindBooks = con.prepareStatement(sqlFindAllBooksOnAuthor);
+            statementFindBooks = SqlDBConnector.getDBConnection().prepareStatement(sqlFindAllBooksOnAuthor);
             statementFindBooks.setString(1, author);
             ResultSet rsBooks = statementFindBooks.executeQuery();
 
@@ -154,7 +164,7 @@ public class SqlFacade implements DbInterface {
                         + "INNER JOIN cities ON cityinbook.cityname = cities.name "
                         + "WHERE cityinbook.bookid = ?;";
                 PreparedStatement statementFindCities = null;
-                statementFindCities = con.prepareStatement(sqlFindCities);
+                statementFindCities = SqlDBConnector.getDBConnection().prepareStatement(sqlFindCities);
                 statementFindCities.setInt(1, id);
                 ResultSet rsCities = statementFindCities.executeQuery();
 
@@ -193,7 +203,7 @@ public class SqlFacade implements DbInterface {
             String sqlFindCitiesNearBy = "SELECT * FROM cities "
                     + "WHERE ST_DWithin(geom, ST_GeographyFromText(?), ? );";
             PreparedStatement statementFindCities = null;
-            statementFindCities = con.prepareStatement(sqlFindCitiesNearBy);
+            statementFindCities = SqlDBConnector.getDBConnection().prepareStatement(sqlFindCitiesNearBy);
             //not right to do, but how should i escape single quotes in a PreparedStatement???
             statementFindCities.setString(1, "SRID=4326;POINT(" + latitude + " " + longitude + ")");
             statementFindCities.setInt(2, radiusInMeter);
@@ -207,24 +217,24 @@ public class SqlFacade implements DbInterface {
             statementFindCities.close();
         } catch (SQLException ex) {
             System.err.println(ex.getClass().getName() + ": " + ex.getMessage());
-            System.exit(0);
+            return null;
         }
 
         return citysList;
     }
 
     //not a part of the interface
-    public void insertGeoOnCities() {
+    public boolean insertGeoOnCities() {
         Statement stmt = null;
         try {
-            stmt = con.createStatement();
+            stmt = SqlDBConnector.getDBConnection().createStatement();
 
             ResultSet rs = stmt.executeQuery("SELECT * FROM cities WHERE geom IS NULL LIMIT 50000;");
             while (rs.next()) {
                 int id = rs.getInt("id");
                 Float latitude = rs.getFloat("latitude");
                 Float longitude = rs.getFloat("longitude");
-                PreparedStatement update = con.prepareStatement("UPDATE cities "
+                PreparedStatement update = SqlDBConnector.getDBConnection().prepareStatement("UPDATE cities "
                         + "SET geom = ST_GeomFromText('POINT(" + latitude + " " + longitude + ")', 4326) "
                         + "WHERE id = " + id);
                 update.executeUpdate();
@@ -234,8 +244,9 @@ public class SqlFacade implements DbInterface {
             stmt.close();
         } catch (SQLException ex) {
             System.err.println(ex.getClass().getName() + ": " + ex.getMessage());
-            System.exit(0);
+            return false;
         }
+        return true;
     }
 
 }

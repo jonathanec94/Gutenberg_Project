@@ -3,9 +3,13 @@ package sql;
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sql.DataSource;
 
 public class SqlDBConnector {
 
+    private static DataSource datasource;
     private static Connection connection = null;
 
     private static String dbName = "administrator";
@@ -23,10 +27,30 @@ public class SqlDBConnector {
     private SqlDBConnector() {
         connection = initializeClient();
     }
+    public static synchronized Connection setSource(DataSource ds)
+    {
+        datasource = ds;
+           try {        
+                connection = datasource.getConnection();
+            } catch (SQLException ex) {
+                Logger.getLogger(SqlDBConnector.class.getName()).log(Level.SEVERE, null, ex);
+            }
+           return connection;
+    }
 
     public static synchronized Connection getDBConnection() {
         if (connection == null) {
-            connection = initializeClient();
+
+            if(datasource == null){  connection = initializeClient(); return connection;}
+              try {       
+                  
+                connection = datasource.getConnection();
+                
+                  return connection;
+            } catch (SQLException ex) {
+                System.out.println("Error in connection :"+ex);
+                Logger.getLogger(SqlDBConnector.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return connection;
     }
@@ -42,8 +66,10 @@ public class SqlDBConnector {
             System.out.println("Connection Failed! Check output console");
             e.printStackTrace();
         }
-
+        
         return connection;
     }
+    
+    
 
 }
