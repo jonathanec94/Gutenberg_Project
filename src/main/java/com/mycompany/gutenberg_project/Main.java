@@ -6,10 +6,18 @@
 package com.mycompany.gutenberg_project;
 
 import DbInterface.Facade;
+import DtoEntity.DtoBookAuthor;
+import DtoEntity.DtoCity;
 import entity.Book;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
 import sql.SqlDBConnector;
 import sql.SqlFacade;
 
@@ -18,27 +26,21 @@ import sql.SqlFacade;
  * @author nikolai
  */
 public class Main {
-    
-//new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/10267.txt")))
 
-//    public void testGetEnglishWords() throws IOException{
-//       Book book = instance.findAllPossibleCitiesInBook(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/10267.txt"))));
-//        System.out.println("size: "+book.getTmpCities().size()); 
-////       for (String city : book.getTmpCities()) {
-////            System.out.println(city);
-////        }
+//    SqlFacade sqlFacade = new SqlFacade();
+//    Facade instance = new Facade(sqlFacade);
+//    public static void main(String[] args) throws IOException {
+//        Main main = new Main();
+//        //main.testGetEnglishWords();
+////        main.instance.insertBooksWithCitiesHelper(); 
 //    }
-    
-//       
-    SqlFacade sqlFacade = new SqlFacade();
-    Facade instance = new Facade(sqlFacade);
-    public static void main(String[] args) throws IOException {
-        Main main = new Main();
-        //main.testGetEnglishWords();
-//        main.instance.insertBooksWithCitiesHelper(); 
+    public static void main(String[] args) {
+        //Main main = new Main();
+        SqlFacade sqlFacade = new SqlFacade();
+        //List<DtoCity> list = sqlFacade.getBooksByGeolocation(55.67594, 12.56553);
+        //        List<DtoCity> list = sqlFacade.getCitiesByTitle("Moby Dick");
+        //        System.out.println(list.get(1).getName());
+        List<DtoBookAuthor> list = sqlFacade.getBooksByAuthor("Abraham Lincoln");
+        System.out.println(list.get(1).getCities().size());
     }
-//    public static void main(String[] args) {
-//        if(SqlDBConnector.getDBConnection() != null)
-//            System.out.println("not null");
-//    }
 }
