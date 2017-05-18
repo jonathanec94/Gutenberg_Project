@@ -19,27 +19,29 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author nikolai
  */
-public class SqlFacade implements DbInterface{
-    
+public class SqlFacade implements DbInterface {
+
     Connection con = SqlDBConnector.getDBConnection();
 
     @Override
     public List<DtoCity> findCities(List<String> city) {
         List<DtoCity> result = new ArrayList();
-        for(String item : city  ){
-            result.add(new DtoCity(item,2,1));
+        for (String item : city) {
+            result.add(new DtoCity(item, 2, 1));
         }
         return result;
     }
 
     @Override
     public boolean insertBook(Book book) {
-         Statement stmt = null;
+        Statement stmt = null;
 
         try {
             con.setAutoCommit(false);
@@ -74,34 +76,166 @@ public class SqlFacade implements DbInterface{
             con.commit();
 
         } catch (SQLException ex) {
-           return false;
+            return false;
         }
         return true;
     }
 
     @Override
     public List<DtoBookAuthor> getBooksByCity(String city) {
-        List<DtoBookAuthor> list = new ArrayList(Arrays.asList(new DtoBookAuthor("book 1", "author 1"),new DtoBookAuthor("book 1", "author 1")));
-        
-        return list;
+        city = city.toLowerCase();
+        List<DtoBookAuthor> listOfBooks = new ArrayList<>();
+
+        String sqlFindBooksByCity = "SELECT books.id, books.title, books.author FROM cities "
+                + "INNER JOIN cityinbook ON cityinbook.cityname = cities.name "
+                + "INNER JOIN books ON books.id = cityinbook.bookid "
+                + "WHERE cityname = ?;";
+        PreparedStatement statementGetBooks = null;
+        try {
+            statementGetBooks = con.prepareStatement(sqlFindBooksByCity);
+            statementGetBooks.setString(1, city);
+            ResultSet rsFindBooks = statementGetBooks.executeQuery();
+
+            while (rsFindBooks.next()) {
+                //System.out.println("id: "+ rsFindBooks.getInt("id"));
+                listOfBooks.add(new DtoBookAuthor(rsFindBooks.getString("title"), rsFindBooks.getString("author")));
+            }
+            rsFindBooks.close();
+            statementGetBooks.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return listOfBooks;
     }
 
     @Override
     public List<DtoCity> getCitiesByTitle(String title) {
-        List<DtoCity> list = new ArrayList(Arrays.asList(new DtoCity("city 1",1,1),new DtoCity("city 2", 2,2)));
-        return list;
+        List<DtoCity> listOfCities = new ArrayList<>();
+        String sqlGetCitiesByTtile = "SELECT cities.name, cities.latitude, cities.longitude FROM books "
+                + "INNER JOIN cityinbook ON cityinbook.bookid = books.id "
+                + "INNER JOIN cities ON cities.name = cityinbook.cityname "
+                + "WHERE books.title = ?;";
+        PreparedStatement statementGetCities = null;
+        try {
+            statementGetCities = con.prepareStatement(sqlGetCitiesByTtile);
+            statementGetCities.setString(1, title);
+            ResultSet rsCities = statementGetCities.executeQuery();
+            while (rsCities.next()) {
+                listOfCities.add(new DtoCity(rsCities.getString("name"), rsCities.getDouble("latitude"), rsCities.getDouble("longitude")));
+            }
+            rsCities.close();
+            statementGetCities.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return listOfCities;
     }
 
     @Override
     public List<DtoBookAuthor> getBooksByAuthor(String author) {
-        List<DtoBookAuthor> list = new ArrayList(Arrays.asList(new DtoBookAuthor("book 1", "author 1"),new DtoBookAuthor("book 1", "author 1")));
-        return list;
+        List<DtoBookAuthor> listOfBooks = new ArrayList();
+
+        String sqlFindAllBooksOnAuthor = "SELECT id, title, author FROM books WHERE books.author = ?";
+        PreparedStatement statementFindBooks = null;
+        try {
+            statementFindBooks = con.prepareStatement(sqlFindAllBooksOnAuthor);
+            statementFindBooks.setString(1, author);
+            ResultSet rsBooks = statementFindBooks.executeQuery();
+
+            while (rsBooks.next()) {
+                int id = rsBooks.getInt("id");
+                String title = rsBooks.getString("title");
+                String authorFromBook = rsBooks.getString("author");
+
+                String sqlFindCities = "SELECT cities.name, cities.latitude, cities.longitude FROM cityinbook "
+                        + "INNER JOIN cities ON cityinbook.cityname = cities.name "
+                        + "WHERE cityinbook.bookid = ?;";
+                PreparedStatement statementFindCities = null;
+                statementFindCities = con.prepareStatement(sqlFindCities);
+                statementFindCities.setInt(1, id);
+                ResultSet rsCities = statementFindCities.executeQuery();
+
+                DtoBookAuthor dtoBookAuthor = new DtoBookAuthor(title, authorFromBook);
+                List<DtoCity> listOfCities = new ArrayList<>();
+                while (rsCities.next()) {
+                    listOfCities.add(new DtoCity(rsCities.getString("name"), rsCities.getDouble("latitude"), rsCities.getDouble("longitude")));
+                }
+                dtoBookAuthor.setCities(listOfCities);
+                //add to the list that we return
+                listOfBooks.add(dtoBookAuthor);
+
+                rsCities.close();
+                statementFindCities.close();
+            }
+
+            rsBooks.close();
+            statementFindBooks.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+        //first find all books from author
+
+        //now run loop on all the books, and find all the cities in the book
+        //make a DtoBookAuthor object with both the author and a list of cities
+        return listOfBooks;
     }
 
     @Override
-    public List<DtoBookCity> getBooksByGeolocation(double latitude, double longitude) {
-        List<DtoBookCity> list = new ArrayList(Arrays.asList(new DtoBookCity("book 1", "author 1"),new DtoBookCity("book 2", "author 2")));
-        return list;
+    public List<DtoCity> getBooksByGeolocation(double latitude, double longitude) {
+        List<DtoCity> citysList = new ArrayList<>();
+        int radiusInMeter = 20000;
+
+        try {
+            String sqlFindCitiesNearBy = "SELECT * FROM cities "
+                    + "WHERE ST_DWithin(geom, ST_GeographyFromText(?), ? );";
+            PreparedStatement statementFindCities = null;
+            statementFindCities = con.prepareStatement(sqlFindCitiesNearBy);
+            //not right to do, but how should i escape single quotes in a PreparedStatement???
+            statementFindCities.setString(1, "SRID=4326;POINT(" + latitude + " " + longitude + ")");
+            statementFindCities.setInt(2, radiusInMeter);
+
+            ResultSet rsFindCities = statementFindCities.executeQuery();
+
+            while (rsFindCities.next()) {
+                citysList.add(new DtoCity(rsFindCities.getString("name"), rsFindCities.getDouble("latitude"), rsFindCities.getDouble("longitude")));
+            }
+            rsFindCities.close();
+            statementFindCities.close();
+        } catch (SQLException ex) {
+            System.err.println(ex.getClass().getName() + ": " + ex.getMessage());
+            System.exit(0);
+        }
+
+        return citysList;
+    }
+
+    //not a part of the interface
+    public void insertGeoOnCities() {
+        Statement stmt = null;
+        try {
+            stmt = con.createStatement();
+
+            ResultSet rs = stmt.executeQuery("SELECT * FROM cities WHERE geom IS NULL LIMIT 50000;");
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                Float latitude = rs.getFloat("latitude");
+                Float longitude = rs.getFloat("longitude");
+                PreparedStatement update = con.prepareStatement("UPDATE cities "
+                        + "SET geom = ST_GeomFromText('POINT(" + latitude + " " + longitude + ")', 4326) "
+                        + "WHERE id = " + id);
+                update.executeUpdate();
+                // System.out.println("latitude: "+latitude + " ::: longitude: "+longitude);
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException ex) {
+            System.err.println(ex.getClass().getName() + ": " + ex.getMessage());
+            System.exit(0);
+        }
     }
 
 }
