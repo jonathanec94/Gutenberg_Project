@@ -29,12 +29,14 @@ public class SqlDBConnector {
     }
     public static synchronized Connection setSource(DataSource ds)
     {
+        if(ds != null){
         datasource = ds;
            try {        
                 connection = datasource.getConnection();
             } catch (SQLException ex) {
                 Logger.getLogger(SqlDBConnector.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
            return connection;
     }
 

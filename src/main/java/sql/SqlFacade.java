@@ -7,7 +7,6 @@ package sql;
 
 import DbInterface.DbInterface;
 import DtoEntity.DtoBookAuthor;
-import DtoEntity.DtoBookCity;
 import DtoEntity.DtoCity;
 import entity.Book;
 import entity.City;
@@ -29,10 +28,7 @@ import javax.sql.DataSource;
  */
 public class SqlFacade implements DbInterface {
     Connection con;
-     public SqlFacade()
-    {
-         SqlDBConnector.getDBConnection();
-    }
+    
     
        public SqlFacade(DataSource ds)
     {
@@ -225,30 +221,6 @@ public class SqlFacade implements DbInterface {
         return books;
     }
 
-    //not a part of the interface
-    public boolean insertGeoOnCities() {
-        Statement stmt = null;
-        try {
-            stmt = SqlDBConnector.getDBConnection().createStatement();
 
-            ResultSet rs = stmt.executeQuery("SELECT * FROM cities WHERE geom IS NULL LIMIT 50000;");
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                Float latitude = rs.getFloat("latitude");
-                Float longitude = rs.getFloat("longitude");
-                PreparedStatement update = SqlDBConnector.getDBConnection().prepareStatement("UPDATE cities "
-                        + "SET geom = ST_GeomFromText('POINT(" + latitude + " " + longitude + ")', 4326) "
-                        + "WHERE id = " + id);
-                update.executeUpdate();
-                // System.out.println("latitude: "+latitude + " ::: longitude: "+longitude);
-            }
-            rs.close();
-            stmt.close();
-        } catch (SQLException ex) {
-            System.err.println(ex.getClass().getName() + ": " + ex.getMessage());
-            return false;
-        }
-        return true;
-    }
 
 }

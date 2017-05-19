@@ -59,9 +59,6 @@ public class Book {
         this.tmpCities = listOfPossibleCities;
     }
 
-    @Override
-    public String toString() {
-        return "Book{" + "title=" + title + ", author=" + author + ", cities=" + cities +", tmpCities="+ tmpCities + '}';
-    }
+  
 
 }
