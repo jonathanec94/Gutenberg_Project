@@ -5,9 +5,10 @@
  */
 package DbInterface;
 
-import DtoEntity.*;
+import DtoEntity.DtoBookAuthor;
+import DtoEntity.DtoCity;
 import entity.Book;
-import entity.City;
+
 import java.util.List;
 
 /**

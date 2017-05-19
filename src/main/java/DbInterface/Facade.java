@@ -5,19 +5,14 @@
  */
 package DbInterface;
 
-import DbInterface.DbInterface;
 import DtoEntity.DtoCity;
 import entity.Book;
-import entity.City;
 
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

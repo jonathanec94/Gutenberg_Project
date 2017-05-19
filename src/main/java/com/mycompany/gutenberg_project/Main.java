@@ -5,21 +5,10 @@
  */
 package com.mycompany.gutenberg_project;
 
-import DbInterface.Facade;
 import DtoEntity.DtoBookAuthor;
-import DtoEntity.DtoCity;
-import entity.Book;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import sql.SqlDBConnector;
 import sql.SqlFacade;
+
+import java.util.List;
 
 /**
  *
