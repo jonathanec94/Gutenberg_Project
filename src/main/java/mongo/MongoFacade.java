@@ -3,18 +3,20 @@ package mongo;
 import DbInterface.DbInterface;
 import DtoEntity.DtoBookAuthor;
 import DtoEntity.DtoCity;
-import com.mongodb.BasicDBObject;
-import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import entity.Book;
 import org.bson.Document;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static com.mongodb.client.model.Filters.*;
 
 //import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.*;
 
 /**
  *
