@@ -9,13 +9,9 @@ import DbInterface.DbInterface;
 import DtoEntity.DtoCity;
 import entity.Book;
 import entity.City;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
+import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -148,4 +144,29 @@ public class Facade {
         return hs;
     }
 
+    public void generateMap(List<DtoCity> cities) throws IOException {
+        String baseUrl = "https://maps.googleapis.com/maps/api/staticmap?size=640x640&scale=2&markers=color:red|55.67594,12.56553|50.98715,4.83695";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(baseUrl);
+
+        for (DtoCity city: cities) {
+            sb.append("|");
+            sb.append(city.getLongitude());
+            sb.append(",");
+            sb.append(city.getLatitude());
+        }
+
+        URL url = new URL(sb.toString());
+        InputStream is = url.openStream();
+        OutputStream os = new FileOutputStream("/home/mathias/Project/Gutenberg/src/main/java/mongo/" + System.currentTimeMillis() + ".png");
+
+        byte[] b = new byte[2048];
+        int length;
+
+        while ((length = is.read(b)) != -1) {os.write(b, 0, length);}
+
+        is.close();
+        os.close();
+    }
 }
