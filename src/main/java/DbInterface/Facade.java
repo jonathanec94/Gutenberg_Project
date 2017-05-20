@@ -5,6 +5,7 @@
  */
 package DbInterface;
 
+import DtoEntity.DtoBookAuthor;
 import DtoEntity.DtoCity;
 import entity.Book;
 
@@ -13,6 +14,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +28,7 @@ public class Facade {
     DbInterface db;
     BufferedReader in;
     private HashSet<String> englishWords;
-    
+
     public Facade(DbInterface db) {
         this.db = db;
         this.englishWords = getEnglishWords(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/all_cities_txt.csv"))));
@@ -145,7 +148,7 @@ public class Facade {
         StringBuilder sb = new StringBuilder();
         sb.append(baseUrl);
 
-        for (DtoCity city: cities) {
+        for (DtoCity city : cities) {
             sb.append("|");
             sb.append(city.getLongitude());
             sb.append(",");
@@ -159,9 +162,47 @@ public class Facade {
         byte[] b = new byte[2048];
         int length;
 
-        while ((length = is.read(b)) != -1) {os.write(b, 0, length);}
+        while ((length = is.read(b)) != -1) {
+            os.write(b, 0, length);
+        }
 
         is.close();
         os.close();
+    }
+
+    public List<DtoBookAuthor> getBooksByCity(String city) {
+        return db.getBooksByCity(city);
+    }
+
+    public List<DtoCity> getCitiesByTitle(String title) {
+        List<DtoCity> listDtoCity = db.getCitiesByTitle(title);
+        try {
+            generateMap(listDtoCity);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return listDtoCity;
+    }
+
+    public List<DtoBookAuthor> getBooksByAuthor(String author) {
+        List<DtoBookAuthor> listDtoBookAuthor = db.getBooksByAuthor(author);
+        try {
+            List<DtoCity> allDtoCities = new ArrayList<>();
+            for (DtoBookAuthor dtoBookAuthor : listDtoBookAuthor) {
+                for (DtoCity dtoCity : dtoBookAuthor.getCities()) {
+                    allDtoCities.add(dtoCity);
+                }
+            }
+            generateMap(allDtoCities);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return listDtoBookAuthor;
+    }
+
+    public List<DtoBookAuthor> getBooksByGeolocation(double latitude, double longitude) {
+        return db.getBooksByGeolocation(latitude, longitude);
     }
 }
