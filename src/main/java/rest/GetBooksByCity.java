@@ -9,18 +9,37 @@ package rest;
  *
  * @author mathias
  */
-import javax.ws.rs.GET;
+import DbInterface.Facade;
+import DtoEntity.DtoBookAuthor;
+import com.google.gson.Gson;
+import java.util.List;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
- 
+import mongo.MongoFacade;
+import org.json.JSONObject;
+
 @Path("/books-by-city")
 public class GetBooksByCity {
- 
-    @GET
-    @Path("/{param}")
-    public Response getMsg(@PathParam("param") String message) {
-        String output = "Test " + message + "!";
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getBooksByCity(String request) {
+
+        Gson gson = new Gson();
+        MongoFacade mf = new MongoFacade();
+        Facade facade = new Facade(mf);
+
+        JSONObject body = new JSONObject(request);
+        String city = body.getString("city");
+        
+        List<DtoBookAuthor> books = facade.getBooksByCity(city);
+
+        String output = gson.toJson(books);
         return Response.status(200).entity(output).build();
     }
 }
