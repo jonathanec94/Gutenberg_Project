@@ -7,15 +7,15 @@ package rest;
 
 /**
  *
- * @author nikolai
+ * @author mathias
  */
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
  
-@Path("/hello")
-public class Hello {
+@Path("/books-by-author")
+public class GetBooksByAuthor {
  
     @GET
     @Path("/{param}")
