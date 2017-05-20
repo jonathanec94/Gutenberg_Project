@@ -4,5 +4,3 @@ jdk: oraclejdk8
 notifications:
   email:
     - jona_egebak@hotmail.dk
-
-bash <(curl -s https://codecov.io/bash) -t 179a8618-aed9-4209-b287-909cf6e1e40f
