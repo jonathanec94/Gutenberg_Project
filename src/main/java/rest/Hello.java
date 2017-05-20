@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.gutenberg_project;
+package rest;
 
 /**
  *
@@ -20,7 +20,7 @@ public class Hello {
     @GET
     @Path("/{param}")
     public Response getMsg(@PathParam("param") String message) {
-        String output = "Hello " + message + "!";
+        String output = "Test " + message + "!";
         return Response.status(200).entity(output).build();
     }
 }

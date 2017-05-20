@@ -77,6 +77,8 @@
                     <webAppConfig>
                         <!-- defaultsDescriptor>src/test/resources/jetty-maven-plugin-webdefault.xml</defaultsDescriptor -->
                     </webAppConfig>
+                    <stopKey>stop</stopKey>
+                    <stopPort>8889</stopPort>
                 </configuration>
             </plugin>
             <plugin>
