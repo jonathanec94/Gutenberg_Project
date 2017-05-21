@@ -1,3 +1,3 @@
-DROP TABLE public.cityinbook;
-DROP TABLE public.books;
-DROP TABLE public.cities;
+DROP TABLE cityinbook;
+DROP TABLE books;
+DROP TABLE cities;
