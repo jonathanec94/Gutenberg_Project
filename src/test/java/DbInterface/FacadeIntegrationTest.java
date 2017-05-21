@@ -46,8 +46,10 @@ public class FacadeIntegrationTest {
             datasource.setDataSourceName("Test travis");
             datasource.setServerName("127.0.0.1");
             datasource.setDatabaseName("travis_ci_test");
-            datasource.setUser("travisUser");
-            datasource.setPassword("travisPassfirebug");
+            //datasource.setUser("travisUser");
+            //datasource.setPassword("travisPass");
+            datasource.setUser("postgres");
+            datasource.setPassword("");
             datasource.setPortNumber(5432);
         }
         else{
