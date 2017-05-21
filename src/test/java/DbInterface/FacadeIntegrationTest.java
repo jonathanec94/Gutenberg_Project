@@ -145,7 +145,8 @@ public class FacadeIntegrationTest {
 
     @Test
     public void getBooksByCityTest() {
-        List<DtoBookAuthor> result = instance.getBooksByCity("city");
+        List<DtoBookAuthor> result = instance.getBooksByCity("copenhagen");
+        assertThat(result.size(), is(2));
     }
 
 }

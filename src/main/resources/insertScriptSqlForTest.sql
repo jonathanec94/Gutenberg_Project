@@ -1,6 +1,6 @@
-DELETE FROM public.cityinbook;
-DELETE FROM public.books;
-DELETE FROM public.cities;
+DELETE FROM cityinbook;
+DELETE FROM books;
+DELETE FROM cities;
 
 INSERT INTO books(id,title, author) VALUES
   (1, 'book1', 'author1'),
