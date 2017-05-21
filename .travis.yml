@@ -1,6 +1,18 @@
 language: java
 jdk: oraclejdk8
-  
+
+services:
+  - postgresql  
+
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
+  - psql -c "CREATE USER travisUser WITH PASSWORD 'travisPass';" -U postgres
+  - psql -U postgres -c "create extension postgis"
+
+test:
+  adapter: postgresql
+  database: travis_ci_test
+
 notifications:
   email:
     - jona_egebak@hotmail.dk
