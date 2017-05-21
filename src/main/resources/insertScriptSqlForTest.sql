@@ -1,6 +1,43 @@
-DELETE FROM cityinbook;
-DELETE FROM books;
-DELETE FROM cities;
+create table books
+(
+	id serial not null
+		constraint table_name_pkey
+			primary key,
+	title varchar(500),
+	author varchar(500)
+);
+
+create unique index table_name_id_uindex on books (id);
+
+create table cities
+(
+	id serial not null,
+	name varchar(500) not null
+		constraint cities_pkey
+			primary key,
+	latitude numeric,
+	longitude numeric,
+	geom geometry(Point,4326)
+);
+
+create unique index cities_id_uindex
+	on cities (id);
+
+create unique index cities_name_uindex
+	on cities (name);
+
+create table cityinbook
+(
+	cityname varchar(500)
+		constraint cityinbook_city
+			references cities,
+	bookid integer
+		constraint cityinbook_book
+			references books
+);
+
+
+
 
 INSERT INTO books(id,title, author) VALUES
   (1, 'book1', 'author1'),
@@ -25,3 +62,5 @@ INSERT INTO cityinbook (cityname, bookid) VALUES
 ('london', 4),
 ('stockholm', 4),
 ('berlin', 4);
+
+

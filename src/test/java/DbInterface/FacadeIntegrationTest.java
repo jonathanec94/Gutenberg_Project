@@ -40,6 +40,7 @@ public class FacadeIntegrationTest {
     SqlFacade sql;
     Connection con;
     PGPoolingDataSource datasource;
+    ScriptRunner runner; 
     public FacadeIntegrationTest() {
         if (System.getenv("TRAVIS") != null) {
             datasource = new PGPoolingDataSource();
@@ -63,9 +64,13 @@ public class FacadeIntegrationTest {
         }
         
         
+       
         
         sql = new SqlFacade(datasource);
         con = SqlDBConnector.setSource(datasource);
+        
+         runner = new ScriptRunner(con, false, false);
+        
 
     }
 
@@ -76,17 +81,18 @@ public class FacadeIntegrationTest {
 
     @AfterClass
     public static void tearDownClass() {
+        
     }
 
     @Before
     public void setUp() throws FileNotFoundException, IOException, SQLException {
         instance = new Facade(sql);
-        ScriptRunner runner = new ScriptRunner(con, false, false);
         runner.runScript(new BufferedReader(new FileReader(this.getClass().getResource("/insertScriptSqlForTest.sql").getFile())));
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws FileNotFoundException, IOException, SQLException {
+        runner.runScript(new BufferedReader(new FileReader(this.getClass().getResource("/testDropTables.sql").getFile())));
         datasource.close();
     }
 
