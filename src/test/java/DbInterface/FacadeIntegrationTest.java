@@ -110,43 +110,49 @@ public class FacadeIntegrationTest {
         assertThat(book.getAuthor(), is("Captain Quincy Allen"));
         assertThat(book.getTitle(), is("The Outdoor Chums"));
         assertThat(book.getTmpCities().size(), is(17));
+        assertThat(book.getCities().size(), is(0));
     }
 
     /* Test
         - First we test when the file dosent exists.
         - Second we test when the files exists.
      */
-//    @Test
-//    public void testInsertBooksWithCities() throws IOException {
-//        BufferedReader in = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/10267.txt")));
-//
-//        Book book = instance.findAllPossibleCitiesInBook(in);
-//
-//        boolean resFalse = instance.insertBooksWithCities("ThisFileDosentExists.txt");
-//        assertThat(resFalse, is(false));
-//
-//        boolean resTrue = instance.insertBooksWithCities(this.getClass().getResource("/10267.txt").getFile());
-//        assertThat(resTrue, is(true));
-//    }
+    @Test
+    public void testInsertBooksWithCities() throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/10267.txt")));
 
-//    @Test
-//    public void testinsertBooksWithCitiesHelper() throws IOException {
-//        assertThat(instance.insertBooksWithCitiesHelper(), is(true));
-//    }
+        Book book = instance.findAllPossibleCitiesInBook(in);
+
+        boolean resFalse = instance.insertBooksWithCities("ThisFileDosentExists.txt");
+        assertThat(resFalse, is(false));
+
+        boolean resTrue = instance.insertBooksWithCities(this.getClass().getResource("/10267.txt").getFile());
+        assertThat(resTrue, is(true));
+    }
+
+    @Test
+    public void testinsertBooksWithCitiesHelper() throws IOException {
+        assertThat(instance.insertBooksWithCitiesHelper(), is(true));
+    }
 
     @Test
     public void getBooksByGeolocationTest() {
-        List<DtoBookAuthor> result = instance.getBooksByGeolocation((double) 1.1, (double) 2.2);
+        List<DtoBookAuthor> result = instance.getBooksByGeolocation((double) 55.67594, (double) 12.56553);
+        assertThat(result.size(),is(2));
     }
-
+/* Edit path in facade, and incomment this agian. */
 //    @Test
 //    public void getBooksByAuthorTest() {
-//        List<DtoBookAuthor> result = instance.getBooksByAuthor("Author");
+//        List<DtoBookAuthor> result = instance.getBooksByAuthor("author1");
+//        assertThat(result.size(),is(1));
+//        assertThat(result.get(0).getTitle(),is("book1"));
+//        assertThat(result.get(0).getCities().size(),is(2));
 //    }
 //
 //    @Test
 //    public void getCitiesByTitleTest() {
 //        List<DtoCity> result = instance.getCitiesByTitle("title");
+//        assertThat(result.size(),is(2));
 //    }
 
     @Test
