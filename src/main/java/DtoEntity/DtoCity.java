@@ -38,9 +38,7 @@ public class DtoCity {
     }
 
 
-    public Integer getId() {
-        return id;
-    }
+   
 
   
     
