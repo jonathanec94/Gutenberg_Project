@@ -8,9 +8,6 @@ before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
   - psql -d travis_ci_test -c 'CREATE EXTENSION postgis;' -U postgres
 
-script:
-- psql -d travis_ci_test -c 'SELECT PostGIS_version();' -U postgres
-
 test:
   adapter: postgresql
   database: travis_ci_test
