@@ -1,0 +1,91 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Gutenberg",
+		"_postman_id": "97709236-7035-0c37-621f-35b532fed620",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Books By City",
+			"request": {
+				"url": "http://localhost:8080/api/books-by-city",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"city\": \"copenhagen\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Books By Author",
+			"request": {
+				"url": "http://localhost:8080/api/books-by-author",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"author\": \"John Milton\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Books By Location",
+			"request": {
+				"url": "http://localhost:8080/api/books-by-location",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"latitude\": 55.67594,\n  \"longitude\": 12.56553\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Cities By Title",
+			"request": {
+				"url": "http://localhost:8080/api/cities-by-title",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"The Song Of Hiawatha\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
