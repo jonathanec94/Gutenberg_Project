@@ -157,8 +157,9 @@ public class Facade {
 
         URL url = new URL(sb.toString());
         InputStream is = url.openStream();
-        OutputStream os = new FileOutputStream("/home/mathias/Project/Gutenberg/src/main/java/mongo/" + System.currentTimeMillis() + ".png");
-
+        String property = System.getProperty("user.dir");
+        OutputStream os = new FileOutputStream(property + "/src/main/java/maps/" + System.currentTimeMillis() + ".png");
+        
         byte[] b = new byte[2048];
         int length;
 
