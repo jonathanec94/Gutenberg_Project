@@ -140,20 +140,20 @@ public class FacadeIntegrationTest {
         List<DtoBookAuthor> result = instance.getBooksByGeolocation((double) 55.67594, (double) 12.56553);
         assertThat(result.size(),is(2));
     }
-/* Edit path in facade, and incomment this agian. */
-//    @Test
-//    public void getBooksByAuthorTest() {
-//        List<DtoBookAuthor> result = instance.getBooksByAuthor("author1");
-//        assertThat(result.size(),is(1));
-//        assertThat(result.get(0).getTitle(),is("book1"));
-//        assertThat(result.get(0).getCities().size(),is(2));
-//    }
-//
-//    @Test
-//    public void getCitiesByTitleTest() {
-//        List<DtoCity> result = instance.getCitiesByTitle("title");
-//        assertThat(result.size(),is(2));
-//    }
+
+    @Test
+    public void getBooksByAuthorTest() {
+        List<DtoBookAuthor> result = instance.getBooksByAuthor("author1");
+        assertThat(result.size(),is(1));
+        assertThat(result.get(0).getTitle(),is("book1"));
+        assertThat(result.get(0).getCities().size(),is(2));
+    }
+
+    @Test
+    public void getCitiesByTitleTest() {
+        List<DtoCity> result = instance.getCitiesByTitle("book1");
+        assertThat(result.size(),is(2));
+    }
 
     @Test
     public void getBooksByCityTest() {
