@@ -3,7 +3,7 @@
 Gruppe : 
 - Mathias Meldgaard Pedersen
 - Joachim Dittman Jepsen
-- Jonathan Egebak Carlsen
+- Jonathan 
 - Nikolai Hansen
 
 Vi har lavet et lille rest api til denne opgave. 
